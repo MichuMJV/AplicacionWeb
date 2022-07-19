@@ -1,0 +1,151 @@
+from scipy.interpolate import lagrange
+import sympy as sym
+import tkinter as T
+import os
+#pip install matplotlib ,  pip install scipy , pip install sympy
+# Ingreso de datos
+#xi = [0,1,4,6]
+#fi = [2,3,18,38]"""
+def restart_program():
+    ventana.destroy()
+    os.startfile("semestral.pyw")
+
+
+def print_text(text):
+   T.Label(frame2, text=text,font=('Helvetica 13 bold')).pack()
+
+def tamanolagr(vari1):
+    n=0
+    if vari1.get().isdecimal():
+        n = int(vari1.get())
+        polinomio(n)
+
+
+def polilagr(xii,fii,num):
+    try:
+        p = lagrange(xii, fii)
+    except:
+        print_text("error en lagrange favor reiniciar")
+    #print(p(evaluar))
+    print_text(p(num))
+
+
+def procedimiento(xi,fi):
+    larg = len(xi)
+    x = sym.Symbol('x') # Colocar simbolo de x en la ecuacion 
+    polinomio = 0
+
+    for i in range(larg):
+        numerador = 1
+        denominador = 1
+        for j in range(larg):
+            if (j != i):
+                numerador = numerador * (x-xi[j])
+                denominador = denominador * (xi[i]-xi[j])
+        termino = (numerador / denominador)
+        polinomio = polinomio + termino * fi[i]
+
+    # Simplificacion del polinomio
+    try:
+        polisimple = polinomio.expand()
+    except:
+        print("Error en polisimple")
+    # Salida
+    print_text(f"Polinomio de Lagrange sin simplificar: {polinomio}")
+    print_text(f"Polinomio de Lagrange simplificado: {polisimple}")
+
+
+
+    eva=T.DoubleVar()
+    evaluar=T.Label(frame2, text="Ingrese el numero a evaluar en el Polinomio de Lagrange: ")
+    entryx=T.Entry(frame2,textvariable=eva)
+    
+    # Evaluacion de Langrange
+    botonlagrange=T.Button(frame2, text="Realizar calculo de lagrange", command=lambda:polilagr(xi, fi,eva.get()))
+    evaluar.pack()
+    entryx.pack()
+    botonlagrange.pack()
+
+    polinomio=0
+    polisimple=0
+    termino=0
+    numerador=0
+    denominador=0
+    larg=0
+
+independiente = []
+dependiente = []
+
+def arraylista(xx, lx, yy, ly):
+    lx.append(xx)
+    ly.append(yy)
+
+def polinomio(n):
+    x=T.DoubleVar()
+    y=T.DoubleVar()
+    for i in range(n):
+        valx=T.Label(frame2, text=f"par ({i+1}) Ingresa el valor para x: ")
+        valx.pack()
+        entryx=T.Entry(frame2 ,textvariable=x)
+        entryx.pack()
+        valy=T.Label(frame2, text=f"par ({i+1}) Ingresa el valor para f(x): ")
+        valy.pack()
+        entryy=T.Entry(frame2 , textvariable=y)
+        entryy.pack()
+        botonadd=T.Button(frame2 , text=f"Agregar{i+1} a arreglo", command=lambda:arraylista(int(x.get()),independiente, int(y.get()), dependiente))
+        botonadd.pack()
+    botoncalculo=T.Button(frame2, text="Ingresar lagrange", command=lambda:procedimiento(independiente,dependiente))
+    botoncalculo.pack()
+    
+
+
+
+ventana = T.Tk()
+ventana.title("Polinomio de lagrange")
+ventana.iconbitmap("Lagrange.ico")
+ventana.geometry("800x300")
+#ventana.eval('tk::PlaceWindow . center')
+
+#create a main Frame
+mainframe=T.Frame(ventana)
+mainframe.pack(fill=T.BOTH, expand=1)
+
+#create a canvas 
+mycanvas=T.Canvas(mainframe)
+mycanvas.pack(side=T.LEFT, fill=T.BOTH, expand=1)
+
+#add Scrollbar to the canvas 
+myscrollbar=T.Scrollbar(mainframe, orient=T.VERTICAL, command=mycanvas.yview)
+myscrollbar.pack(side=T.RIGHT, fill=T.Y)
+
+#configure the canvas 
+mycanvas.configure(yscrollcommand=myscrollbar.set)
+mycanvas.bind('<Configure>', lambda e: mycanvas.configure(scrollregion=mycanvas.bbox("all")))
+
+#create another frame inside canvas
+frame2= T.Frame(mycanvas)
+
+#add that new frame to a windows in the canvas 
+mycanvas.create_window((0,0),window=frame2, anchor="nw")
+mycanvas.config(background="#f98134")
+#solo se cambia ventana por frame2
+
+
+etiqueta = T.Label(frame2, text= "Proyecto semestral").pack()
+etiqueta2 = T.Label(frame2, text= "Metodos Numericos").pack()
+etiqueta3 = T.Label(frame2, text= "Grupo 1SF132").pack()
+etiqueta4 = T.Label(frame2, text= "Polinomio de Lagrange").pack()
+#boton1=T.Button(ventana, text="Presiona", command=lambda: etiqueta4.pack_forget()).pack() #padx, pady
+
+
+
+etiquetan = T.Label(frame2, text= "Ingresa el tamano para x, f(x): ").pack()
+n=T.IntVar(frame2)
+inputn=T.Entry(frame2, textvariable=n)
+inputn.pack()
+botonn=T.Button(frame2, text="Ingresar lagrange", command=lambda:polinomio(int(n.get())))
+botonn.pack()
+botonRRR=T.Button(frame2, text="Nuevo Calculo", command=restart_program).pack()
+ventana.mainloop()
+
+
